@@ -1,16 +1,10 @@
 const routerUsers = require('express').Router();
+const { getAllUsers, getUserById, createUser } = require('../controllers/users');
 
-routerUsers.get('/users', (req, res) => {
-  res.send('вернули массив пользователей');
-});
+routerUsers.get('/users', getAllUsers);
 
-routerUsers.get('/users/:userId', (req, res) => {
-  res.send(`вернули пользователя c id ${req.params.userId}`);
-});
+routerUsers.get('/users/:userId', getUserById);
 
-routerUsers.post('/users', (req, res) => {
-  const { name } = req.body;
-  res.send(`создали нового пользователя по имени ${name}`);
-});
+routerUsers.post('/users', createUser);
 
 module.exports = routerUsers;
