@@ -12,6 +12,14 @@ const app = express();
 
 app.use(express.json());
 
+app.use((req, res, next) => {
+  req.user = {
+    _id: '634c6c0ebda23aa42d5c668e',
+  };
+
+  next();
+});
+
 app.use('/', routerCards);
 app.use('/', routerUsers);
 

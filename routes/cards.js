@@ -1,15 +1,14 @@
 const routerCards = require('express').Router();
+const {
+  getAllCards, getCardById, createCard, removeCardById,
+} = require('../controllers/cards');
 
-routerCards.get('/cards', (req, res) => {
-  res.send('вернули массив карточек');
-});
+routerCards.get('/cards', getAllCards);
 
-routerCards.post('/cards', (req, res) => {
-  res.send('создали новую карточку');
-});
+routerCards.get('/cards/:cardId', getCardById);
 
-routerCards.delete('/cards/:cardId', (req, res) => {
-  res.send(`удалили карточку c id ${req.params.cardId}`);
-});
+routerCards.post('/cards', createCard);
+
+routerCards.delete('/cards/:cardId', removeCardById);
 
 module.exports = routerCards;
