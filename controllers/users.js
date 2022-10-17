@@ -12,7 +12,11 @@ module.exports.getAllUsers = (req, res) => {
 
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
-    .then((user) => res.send(user))
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: 'Пользователь с такими данными не найден' });
+      } else { res.send(user); }
+    })
     .catch((err) => res.status(errorHandler(err).statusCode).send(errorHandler(err).response));
 };
 

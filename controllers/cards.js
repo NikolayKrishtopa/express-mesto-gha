@@ -29,7 +29,13 @@ module.exports.createCard = (req, res) => {
 
 module.exports.removeCardById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => res.send(card))
+    .then(((card) => {
+      if (!card) {
+        res.status(400).send({ message: 'Вы пытаетесь удалить несуществующую карточку' });
+      } else {
+        res.send(card);
+      }
+    }))
     .catch((err) => res.status(errorHandler(err).statusCode).send(errorHandler(err).response));
 };
 
@@ -38,7 +44,13 @@ module.exports.likeCardById = (req, res) => {
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     patchRequestOptions,
-  ).then((card) => res.send(card.likes))
+  ).then((card) => {
+    if (!card) {
+      res.status(400).send({ message: 'Вы обращаетесь к несуществующей карточке' });
+    } else {
+      res.send(card.likes);
+    }
+  })
     .catch((err) => res.status(errorHandler(err).statusCode).send(errorHandler(err).response));
 };
 
@@ -47,6 +59,12 @@ module.exports.unlikeCardById = (req, res) => {
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     patchRequestOptions,
-  ).then((card) => res.send(card.likes))
+  ).then((card) => {
+    if (!card) {
+      res.status(400).send({ message: 'Вы обращаетесь к несуществующей карточке' });
+    } else {
+      res.send(card.likes);
+    }
+  })
     .catch((err) => res.status(errorHandler(err).statusCode).send(errorHandler(err).response));
 };
