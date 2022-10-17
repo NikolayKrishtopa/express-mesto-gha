@@ -8,7 +8,7 @@ node_modules
 
 # Optional npm cache directory
 .npm
-.github
+# .github
 
 # Optional REPL history
 .DS_Store
