@@ -1,6 +1,6 @@
 const Card = require('../models/card');
 
-const errorHandler = require('../middlewares/errorHandler');
+const errorHandler = require('../utils/errorHandler');
 
 const patchRequestOptions = require('../utils/utils');
 
@@ -35,13 +35,13 @@ module.exports.removeCardById = (req, res) => {
     res.status(400).send({ message: 'Проверьте правильность запрашиваемых данных' });
   }
   Card.findByIdAndRemove(req.params.cardId)
-    .then(((card) => {
+    .then((card) => {
       if (!card) {
-        res.status(400).send({ message: 'Вы пытаетесь удалить несуществующую карточку' });
+        res.status(404).send({ message: 'Такой карточки не существует' });
       } else {
-        res.send(card);
+        res.send(card.likes);
       }
-    }))
+    })
     .catch((err) => res.status(errorHandler(err).statusCode).send(errorHandler(err).response));
 };
 
@@ -55,7 +55,7 @@ module.exports.likeCardById = (req, res) => {
     patchRequestOptions,
   ).then((card) => {
     if (!card) {
-      res.status(400).send({ message: 'Вы обращаетесь к несуществующей карточке' });
+      res.status(404).send({ message: 'Вы обращаетесь к несуществующей карточке' });
     } else {
       res.send(card.likes);
     }
@@ -65,7 +65,7 @@ module.exports.likeCardById = (req, res) => {
 
 module.exports.unlikeCardById = (req, res) => {
   if (req.params.cardId.length !== 24) {
-    res.status(400).send({ message: 'Проверьте правильность запрашиваемых данных' });
+    res.status(404).send({ message: 'Проверьте правильность запрашиваемых данных' });
   }
   Card.findByIdAndUpdate(
     req.params.cardId,

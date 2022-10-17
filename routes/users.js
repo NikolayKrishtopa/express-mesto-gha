@@ -3,11 +3,8 @@ const {
   getAllUsers, getUserById, createUser, updateProfile, updateAvatar,
 } = require('../controllers/users');
 
-// const doesUserExist = require('../middlewares/doesUserExist');
-
 routerUsers.get('/users', getAllUsers);
 
-// routerUsers.get('/users/:userId', doesUserExist);
 routerUsers.get('/users/:userId', getUserById);
 
 routerUsers.post('/users', createUser);

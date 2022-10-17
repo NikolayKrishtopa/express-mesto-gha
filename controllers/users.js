@@ -2,7 +2,7 @@ const User = require('../models/user');
 
 const patchRequestOptions = require('../utils/utils');
 
-const errorHandler = require('../middlewares/errorHandler');
+const errorHandler = require('../utils/errorHandler');
 
 module.exports.getAllUsers = (req, res) => {
   User.find({})
