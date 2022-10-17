@@ -48,6 +48,7 @@ module.exports.removeCardById = (req, res) => {
 module.exports.likeCardById = (req, res) => {
   if (req.params.cardId.length !== 24) {
     res.status(400).send({ message: 'Проверьте правильность запрашиваемых данных' });
+    return;
   }
   Card.findByIdAndUpdate(
     req.params.cardId,
@@ -66,6 +67,7 @@ module.exports.likeCardById = (req, res) => {
 module.exports.unlikeCardById = (req, res) => {
   if (req.params.cardId.length !== 24) {
     res.status(404).send({ message: 'Проверьте правильность запрашиваемых данных' });
+    return;
   }
   Card.findByIdAndUpdate(
     req.params.cardId,
