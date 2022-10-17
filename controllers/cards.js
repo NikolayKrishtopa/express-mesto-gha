@@ -66,7 +66,7 @@ module.exports.likeCardById = (req, res) => {
 
 module.exports.unlikeCardById = (req, res) => {
   if (req.params.cardId.length !== 24) {
-    res.status(404).send({ message: 'Проверьте правильность запрашиваемых данных' });
+    res.status(400).send({ message: 'Проверьте правильность запрашиваемых данных' });
     return;
   }
   Card.findByIdAndUpdate(
@@ -75,7 +75,7 @@ module.exports.unlikeCardById = (req, res) => {
     patchRequestOptions,
   ).then((card) => {
     if (!card) {
-      res.status(400).send({ message: 'Вы обращаетесь к несуществующей карточке' });
+      res.status(404).send({ message: 'Вы обращаетесь к несуществующей карточке' });
     } else {
       res.send(card.likes);
     }
