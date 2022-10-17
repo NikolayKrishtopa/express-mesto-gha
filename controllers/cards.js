@@ -11,6 +11,9 @@ module.exports.getAllCards = (req, res) => {
 };
 
 module.exports.getCardById = (req, res) => {
+  if (req.params.cardId.length !== 24) {
+    res.status(400).send({ message: 'Проверьте правильность запрашиваемых данных' });
+  }
   Card.findById(req.params.cardId)
     .then((card) => res.send(card))
     .catch((err) => res.status(errorHandler(err).statusCode).send(errorHandler(err).response));
@@ -28,6 +31,9 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.removeCardById = (req, res) => {
+  if (req.params.cardId.length !== 24) {
+    res.status(400).send({ message: 'Проверьте правильность запрашиваемых данных' });
+  }
   Card.findByIdAndRemove(req.params.cardId)
     .then(((card) => {
       if (!card) {
@@ -40,6 +46,9 @@ module.exports.removeCardById = (req, res) => {
 };
 
 module.exports.likeCardById = (req, res) => {
+  if (req.params.cardId.length !== 24) {
+    res.status(400).send({ message: 'Проверьте правильность запрашиваемых данных' });
+  }
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -55,6 +64,9 @@ module.exports.likeCardById = (req, res) => {
 };
 
 module.exports.unlikeCardById = (req, res) => {
+  if (req.params.cardId.length !== 24) {
+    res.status(400).send({ message: 'Проверьте правильность запрашиваемых данных' });
+  }
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
