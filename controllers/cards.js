@@ -13,6 +13,7 @@ module.exports.getAllCards = (req, res) => {
 module.exports.getCardById = (req, res) => {
   if (req.params.cardId.length !== 24) {
     res.status(400).send({ message: 'Проверьте правильность запрашиваемых данных' });
+    return;
   }
   Card.findById(req.params.cardId)
     .then((card) => res.send(card))
@@ -33,6 +34,7 @@ module.exports.createCard = (req, res) => {
 module.exports.removeCardById = (req, res) => {
   if (req.params.cardId.length !== 24) {
     res.status(400).send({ message: 'Проверьте правильность запрашиваемых данных' });
+    return;
   }
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
