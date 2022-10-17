@@ -12,7 +12,7 @@ module.exports.getAllUsers = (req, res) => {
 
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
-    .then((users) => res.send(users))
+    .then((user) => res.send(user))
     .catch((err) => res.status(errorHandler(err).statusCode).send(errorHandler(err).response));
 };
 

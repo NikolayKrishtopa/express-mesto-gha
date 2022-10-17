@@ -14,7 +14,7 @@ function errorHandler(err) {
     };
   }
   return {
-    response: { message: `Ошибка по умолчанию (${err.message})` },
+    response: { message: `Ошибка по умолчанию (${err})` },
     statusCode: 500,
   };
 }
