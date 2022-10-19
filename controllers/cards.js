@@ -100,6 +100,4 @@ module.exports.unlikeCardById = (req, res) => {
       }
       res.status(500).send({ message: 'Ошибка по умолчанию' });
     });
-
-  res.status(404).send({ message: 'По вашему запросу ничего не найдено' });
 };
