@@ -5,8 +5,6 @@ const {
 
 routerCards.get('/cards', getAllCards);
 
-routerCards.get('/cards/:cardId', getCardById);
-
 routerCards.post('/cards', createCard);
 
 routerCards.delete('/cards/:cardId', removeCardById);

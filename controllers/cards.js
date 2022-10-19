@@ -1,23 +1,13 @@
-const Card = require('../models/card');
+const mongoose = require('mongoose');
 
-const errorHandler = require('../utils/errorHandler');
+const Card = require('../models/card');
 
 const patchRequestOptions = require('../utils/utils');
 
 module.exports.getAllCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(errorHandler(err).statusCode).send(errorHandler(err).response));
-};
-
-module.exports.getCardById = (req, res) => {
-  if (req.params.cardId.length !== 24) {
-    res.status(400).send({ message: 'Проверьте правильность запрашиваемых данных' });
-    return;
-  }
-  Card.findById(req.params.cardId)
-    .then((card) => res.send(card))
-    .catch((err) => res.status(errorHandler(err).statusCode).send(errorHandler(err).response));
+    .catch(() => res.status(500).send({ message: 'Ошибка по умолчанию' }));
 };
 
 module.exports.createCard = (req, res) => {
@@ -28,7 +18,12 @@ module.exports.createCard = (req, res) => {
     name, link, owner: _id, likes: [], createdAt: new Date(),
   })
     .then((card) => res.send(card))
-    .catch((err) => res.status(errorHandler(err).statusCode).send(errorHandler(err).response));
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        res.status(400).send({ message: 'Проверьте правильность введённых данных' });
+      }
+      res.status(500).send({ message: 'Ошибка по умолчанию' });
+    });
 };
 
 module.exports.removeCardById = (req, res) => {
@@ -41,10 +36,16 @@ module.exports.removeCardById = (req, res) => {
       if (!card) {
         res.status(404).send({ message: 'Такой карточки не существует' });
       } else {
-        res.send(card.likes);
+        res.send(card);
       }
     })
-    .catch((err) => res.status(errorHandler(err).statusCode).send(errorHandler(err).response));
+    .catch((err) => {
+      if (err instanceof mongoose.Error.CastError) {
+        res.status(404).send({ message: 'По вашему запросу ничего не найдено' });
+        return;
+      }
+      res.status(500).send({ message: 'Ошибка по умолчанию' });
+    });
 };
 
 module.exports.likeCardById = (req, res) => {
@@ -60,10 +61,18 @@ module.exports.likeCardById = (req, res) => {
     if (!card) {
       res.status(404).send({ message: 'Вы обращаетесь к несуществующей карточке' });
     } else {
-      res.send(card.likes);
+      res.send(card);
     }
   })
-    .catch((err) => res.status(errorHandler(err).statusCode).send(errorHandler(err).response));
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        res.status(400).send({ message: 'Проверьте правильность введённых данных' });
+      }
+      if (err instanceof mongoose.Error.CastError) {
+        res.status(404).send({ message: 'По вашему запросу ничего не найдено' });
+      }
+      res.status(500).send({ message: 'Ошибка по умолчанию' });
+    });
 };
 
 module.exports.unlikeCardById = (req, res) => {
@@ -79,8 +88,18 @@ module.exports.unlikeCardById = (req, res) => {
     if (!card) {
       res.status(404).send({ message: 'Вы обращаетесь к несуществующей карточке' });
     } else {
-      res.send(card.likes);
+      res.send(card);
     }
   })
-    .catch((err) => res.status(errorHandler(err).statusCode).send(errorHandler(err).response));
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        res.status(400).send({ message: 'Проверьте правильность введённых данных' });
+      }
+      if (err instanceof mongoose.Error.CastError) {
+        res.status(404).send({ message: 'По вашему запросу ничего не найдено' });
+      }
+      res.status(500).send({ message: 'Ошибка по умолчанию' });
+    });
+
+  res.status(404).send({ message: 'По вашему запросу ничего не найдено' });
 };
