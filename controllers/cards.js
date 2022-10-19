@@ -21,6 +21,7 @@ module.exports.createCard = (req, res) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         res.status(400).send({ message: 'Проверьте правильность введённых данных' });
+        return
       }
       res.status(500).send({ message: 'Ошибка по умолчанию' });
     });
@@ -67,9 +68,11 @@ module.exports.likeCardById = (req, res) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         res.status(400).send({ message: 'Проверьте правильность введённых данных' });
+        return;
       }
       if (err instanceof mongoose.Error.CastError) {
         res.status(404).send({ message: 'По вашему запросу ничего не найдено' });
+        return;
       }
       res.status(500).send({ message: 'Ошибка по умолчанию' });
     });
@@ -94,9 +97,11 @@ module.exports.unlikeCardById = (req, res) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         res.status(400).send({ message: 'Проверьте правильность введённых данных' });
+        return;
       }
       if (err instanceof mongoose.Error.CastError) {
         res.status(404).send({ message: 'По вашему запросу ничего не найдено' });
+        return;
       }
       res.status(500).send({ message: 'Ошибка по умолчанию' });
     });
