@@ -1,3 +1,5 @@
+const validator = require('validator');
+
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
@@ -5,20 +7,30 @@ const { Schema } = mongoose;
 const userSchema = new Schema({
   name: {
     type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30,
+    default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30,
+    default: 'Исследователь',
   },
   avatar: {
     type: String,
-    required: true,
+    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
+  // email: {
+  //   type: String,
+  //   required: true,
+  //   unique: true,
+  //   validate: {
+  //     validator(v) { validator.isEmail(v); },
+  //     message: 'Адрес электронной почты введен в неправильном формате',
+  //   },
+  // },
+  // password: {
+  //   type: String,
+  //   required: true,
+  //   minlength: 4,
+  // },
 });
 
 module.exports = mongoose.model('user', userSchema);
