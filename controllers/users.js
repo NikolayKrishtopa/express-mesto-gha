@@ -1,42 +1,51 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-
 const bcrypt = require('bcryptjs');
+const DefaultError = require('../utils/errors/DefaultError');
+const ValidationError = require('../utils/errors/ValidationError');
+const NotFoundError = require('../utils/errors/DefaultError');
+const UnauthorizedError = require('../utils/errors/UnauthorizedError');
+
 const TOKEN_ENCRYPT_KEY = require('../utils/key');
 
 const User = require('../models/user');
 
 const patchRequestOptions = require('../utils/utils');
 
-module.exports.getAllUsers = (req, res) => {
+module.exports.getAllUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch(() => {
-      res.status(500).send({ message: 'Ошибка по умолчанию' });
+    .catch((err) => {
+      if (err.statusCode) {
+        next(err);
+      } else {
+        next(new DefaultError('Ошибка сервера'));
+      }
     });
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   if (req.params.userId.length !== 24) {
-    res.status(400).send({ message: 'Проверьте правильность запрашиваемых данных' });
-    return;
+    throw new ValidationError('Проверьте правильность запрашиваемых данных');
   }
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Пользователь с такими данными не найден' });
+        throw new NotFoundError('Пользователь с такими данными не найден');
       } else { res.send(user); }
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
-        res.status(400).send({ message: 'По вашему запросу ничего не найдено' });
+      if (err.statusCode) {
+        next(err);
+      } else if (err instanceof mongoose.Error.CastError) {
+        next(new ValidationError('По вашему запросу ничего не найдено'));
         return;
       }
-      res.status(500).send({ message: 'Ошибка по умолчанию' });
+      next(new DefaultError('Ошибка сервера'));
     });
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -46,72 +55,73 @@ module.exports.createUser = (req, res) => {
     }))
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        res.status(400).send({ message: 'Проверьте правильность введённых данных' });
+      if (err.statusCode) {
+        next(err);
+      } else if (err instanceof mongoose.Error.ValidationError) {
+        next(new ValidationError('Проверьте правильность введённых данных'));
         return;
       }
-      res.status(500).send({ message: 'Ошибка по умолчанию' });
+      next(new DefaultError('Проверьте правильность введённых данных'));
     });
 };
 
-module.exports.updateProfile = (req, res) => {
+module.exports.updateProfile = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, patchRequestOptions)
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Пользователя с такими данными не существует' });
-        return;
+        throw new NotFoundError('Проверьте правильность введённых данных');
       }
       res.send(user);
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        res.status(400).send({ message: 'Проверьте правильность введённых данных' });
-        return;
+      if (err.statusCode) {
+        next(err);
+      } else if (err instanceof mongoose.Error.ValidationError) {
+        next(new ValidationError('Проверьте правильность введённых данных'));
       }
       if (err instanceof mongoose.Error.CastError) {
-        res.status(400).send({ message: 'По вашему запросу ничего не найдено' });
-        return;
+        next(new ValidationError('По вашему запросу ничего не найдено'));
       }
-      res.status(500).send({ message: 'Ошибка по умолчанию' });
+      next(new DefaultError('На сервере произошла ошибка'));
     });
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, patchRequestOptions)
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Пользователя с такими данными не существует' });
-        return;
+        throw new NotFoundError('Пользователя с такими данными не существует');
       }
       res.send(user);
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        res.status(400).send({ message: 'Проверьте правильность введённых данных' });
-        return;
+      if (err.statusCode) {
+        next(err);
+      } else if (err instanceof mongoose.Error.ValidationError) {
+        next(new ValidationError('Проверьте правильность введённых данных'));
       }
       if (err instanceof mongoose.Error.CastError) {
-        res.status(400).send({ message: 'По вашему запросу ничего не найдено' });
-        return;
+        next(new ValidationError('По вашему запросу ничего не найдено'));
       }
-      res.status(500).send({ message: 'Ошибка по умолчанию' });
+      next(new DefaultError('На сервере произошла ошибка'));
     });
 };
 
-module.exports.getMyProfile = (req, res) => {
+module.exports.getMyProfile = (req, res, next) => {
   const token = req.cookies.jwt;
-  if (!token) { res.status(401).send({ message: 'Необходима авторизация' }); }
+  if (!token) { throw new UnauthorizedError('Необходима авторизация'); }
   let payload;
   try {
     payload = jwt.verify(token, TOKEN_ENCRYPT_KEY);
     return User.findById(payload._id)
       .then((user) => res.send(user))
-      .catch(() => res.status(401).send({ message: 'Необходима авторизация' }));
+      .catch(() => next(new UnauthorizedError('Необходима авторизация')));
   } catch (err) {
-    return res
-      .status(401)
-      .send({ message: 'Необходима авторизация' });
+    if (err.statusCode) {
+      return next(err);
+    }
+    return next(new DefaultError('что-то пошло не'));
   }
 };

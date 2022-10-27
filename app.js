@@ -9,6 +9,7 @@ const routerUsers = require('./routes/users');
 const { login } = require('./controllers/login');
 const { createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const errorHandler = require('./middlewares/errorHandler');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -21,6 +22,7 @@ app.post('/signup', createUser);
 app.use('/', auth);
 app.use('/', routerCards);
 app.use('/', routerUsers);
+app.use('/', errorHandler);
 
 app.use('*', (req, res) => {
   res.status(404).send({ message: 'По вашему запросу ничего не найдено' });
