@@ -10,7 +10,7 @@ const TOKEN_ENCRYPT_KEY = require('../utils/key');
 
 const User = require('../models/user');
 
-const patchRequestOptions = require('../utils/utils');
+const { patchRequestOptions } = require('../utils/utils');
 
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})

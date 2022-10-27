@@ -6,7 +6,7 @@ const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 
 const Card = require('../models/card');
 
-const patchRequestOptions = require('../utils/utils');
+const { patchRequestOptions } = require('../utils/utils');
 
 module.exports.getAllCards = (req, res, next) => {
   Card.find({})
