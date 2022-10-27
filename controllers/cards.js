@@ -20,10 +20,10 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(400).send({ message: 'Проверьте правильность введённых данных' });
+        res.status(400).send({ message: ['Проверьте правильность введённых данных'] });
         return;
       }
-      res.status(500).send({ message: 'Ошибка по умолчанию' });
+      res.status(500).send({ message: ['Ошибка по умолчанию'] });
     });
 };
 
@@ -32,12 +32,16 @@ module.exports.removeCardById = (req, res) => {
     res.status(400).send({ message: 'Проверьте правильность запрашиваемых данных' });
     return;
   }
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         res.status(404).send({ message: 'Такой карточки не существует' });
+      } else if (req.user._id !== card.owner._id.toString()) {
+        res.status(401).send({ message: 'у вас нет прав на удаление этой карточки' });
       } else {
-        res.send(card);
+        Card.findByIdAndRemove(req.params.cardId)
+          .then(() => { res.send(card); })
+          .catch(() => Promise.reject(new Error('Что-то пошло не так')));
       }
     })
     .catch((err) => {

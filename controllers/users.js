@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 
 const bcrypt = require('bcryptjs');
 
@@ -96,4 +97,20 @@ module.exports.updateAvatar = (req, res) => {
       }
       res.status(500).send({ message: 'Ошибка по умолчанию' });
     });
+};
+
+module.exports.getMyProfile = (req, res) => {
+  const token = req.cookies.jwt;
+  if (!token) { res.status(401).send({ message: 'Необходима авторизация' }); }
+  let payload;
+  try {
+    payload = jwt.verify(token, 'Nikolay\'s key');
+    return User.findById(payload._id)
+      .then((user) => res.send(user))
+      .catch(() => res.status(401).send({ message: 'Необходима авторизация' }));
+  } catch (err) {
+    return res
+      .status(401)
+      .send({ message: 'Необходима авторизация' });
+  }
 };
