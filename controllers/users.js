@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
 const bcrypt = require('bcryptjs');
+const TOKEN_ENCRYPT_KEY = require('../utils/key');
 
 const User = require('../models/user');
 
@@ -104,7 +105,7 @@ module.exports.getMyProfile = (req, res) => {
   if (!token) { res.status(401).send({ message: 'Необходима авторизация' }); }
   let payload;
   try {
-    payload = jwt.verify(token, 'Nikolay\'s key');
+    payload = jwt.verify(token, TOKEN_ENCRYPT_KEY);
     return User.findById(payload._id)
       .then((user) => res.send(user))
       .catch(() => res.status(401).send({ message: 'Необходима авторизация' }));

@@ -1,11 +1,12 @@
 const jwt = require('jsonwebtoken');
+const TOKEN_ENCRYPT_KEY = require('../utils/key');
 const User = require('../models/user');
 
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
   User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'Nikolay\'s key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, TOKEN_ENCRYPT_KEY, { expiresIn: '7d' });
       res.cookie('jwt', token, {
         maxAge: 60 * 60 * 24 * 7,
         httpOnly: true,
