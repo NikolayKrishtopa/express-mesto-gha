@@ -5,6 +5,7 @@ const DefaultError = require('../utils/errors/DefaultError');
 const ValidationError = require('../utils/errors/ValidationError');
 const NotFoundError = require('../utils/errors/DefaultError');
 const UnauthorizedError = require('../utils/errors/UnauthorizedError');
+const UserExistError = require('../utils/errors/UserExistError');
 
 const TOKEN_ENCRYPT_KEY = require('../utils/key');
 
@@ -59,9 +60,11 @@ module.exports.createUser = (req, res, next) => {
         next(err);
       } else if (err instanceof mongoose.Error.ValidationError) {
         next(new ValidationError('Проверьте правильность введённых данных'));
-        return;
+      } else if (err.code === 11000) {
+        next(new UserExistError('Пользователь с такими данными существует'));
+      } else {
+        next(new DefaultError('Проверьте правильность введённых данных'));
       }
-      next(new DefaultError('Проверьте правильность введённых данных'));
     });
 };
 
