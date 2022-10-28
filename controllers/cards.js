@@ -36,9 +36,6 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.removeCardById = (req, res, next) => {
-  if (req.params.cardId.length !== 24) {
-    throw new ValidationError('Введен некорректный запрос');
-  }
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
@@ -69,9 +66,6 @@ module.exports.removeCardById = (req, res, next) => {
 };
 
 module.exports.likeCardById = (req, res, next) => {
-  if (req.params.cardId.length !== 24) {
-    throw new ValidationError('Введен некорректный запрос');
-  }
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -105,9 +99,6 @@ module.exports.likeCardById = (req, res, next) => {
 };
 
 module.exports.unlikeCardById = (req, res, next) => {
-  if (req.params.cardId.length !== 24) {
-    throw new ValidationError('Введен некорректный запрос');
-  }
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },

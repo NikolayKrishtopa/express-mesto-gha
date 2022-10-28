@@ -26,9 +26,6 @@ module.exports.getAllUsers = (req, res, next) => {
 };
 
 module.exports.getUserById = (req, res, next) => {
-  if (req.params.userId.length !== 24) {
-    throw new ValidationError('Проверьте правильность запрашиваемых данных');
-  }
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
