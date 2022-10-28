@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const DefaultError = require('../utils/errors/DefaultError');
 const ValidationError = require('../utils/errors/ValidationError');
-const NotFoundError = require('../utils/errors/DefaultError');
+const NotFoundError = require('../utils/errors/NotFoundError');
 const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 
 const Card = require('../models/card');
