@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const DefaultError = require('../utils/errors/DefaultError');
 const ValidationError = require('../utils/errors/ValidationError');
 const NotFoundError = require('../utils/errors/NotFoundError');
-const UnauthorizedError = require('../utils/errors/UnauthorizedError');
+const NotAllowedError = require('../utils/errors/NotAllowedError');
 
 const Card = require('../models/card');
 
@@ -41,7 +41,7 @@ module.exports.removeCardById = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Такой карточки не существует');
       } else if (req.user._id !== card.owner._id.toString()) {
-        throw new UnauthorizedError('у вас нет прав на удаление этой карточки');
+        throw new NotAllowedError('у вас нет прав на удаление этой карточки');
       } else {
         Card.findByIdAndRemove(req.params.cardId)
           .then(() => { res.send(card); })
