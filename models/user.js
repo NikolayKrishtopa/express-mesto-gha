@@ -1,6 +1,6 @@
 const validator = require('validator');
 const mongoose = require('mongoose');
-const { findUserBeCredentials } = require('../utils/utils');
+const { findUserBeCredentials, urlValidatorConfig } = require('../utils/utils');
 
 const { Schema } = mongoose;
 
@@ -21,6 +21,12 @@ const userSchema = new Schema(
     avatar: {
       type: String,
       default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+      validate: {
+        validator(v) {
+          return validator.isURL(v, urlValidatorConfig);
+        },
+        message: 'Недопустимый формат ввода. Введите URL адрес',
+      },
     },
     email: {
       type: String,

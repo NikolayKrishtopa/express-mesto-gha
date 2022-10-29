@@ -13,6 +13,7 @@ const { login } = require('./controllers/login');
 const { createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/errorHandler');
+const NotFoundError = require('./utils/errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -23,14 +24,12 @@ app.post('/signin', userBodyValidator, login);
 app.post('/signup', userBodyValidator, createUser);
 
 app.use(auth);
-app.use(routerCards);
-app.use(routerUsers);
+app.use('/cards', routerCards);
+app.use('/users', routerUsers);
+app.use('*', () => { throw new NotFoundError('По вашему запросу ничего не найдено'); });
+
 app.use(errors());
 app.use(errorHandler);
-
-app.use('*', (req, res) => {
-  res.status(404).send({ message: 'По вашему запросу ничего не найдено' });
-});
 
 app.listen(PORT, () => {
   // console.log(`App listening on port ${PORT}`);

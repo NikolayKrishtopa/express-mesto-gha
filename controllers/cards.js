@@ -61,7 +61,7 @@ module.exports.removeCardById = (req, res, next) => {
         next(new NotFoundError('По вашему запросу ничего не найдено'));
         return;
       }
-      res.status(500).send({ message: 'Ошибка по умолчанию' });
+      next(new DefaultError('Ошибка по умолчанию'));
     });
 };
 
@@ -88,10 +88,6 @@ module.exports.likeCardById = (req, res, next) => {
       }
       if (err instanceof mongoose.Error.CastError) {
         next(new ValidationError('По вашему запросу ничего не найдено'));
-        return;
-      }
-      if (err instanceof NotFoundError) {
-        next(err);
         return;
       }
       next(new DefaultError('На сервере произошла ошибка'));

@@ -1,13 +1,9 @@
 const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const DefaultError = require('../utils/errors/DefaultError');
 const ValidationError = require('../utils/errors/ValidationError');
 const NotFoundError = require('../utils/errors/NotFoundError');
-const UnauthorizedError = require('../utils/errors/UnauthorizedError');
 const UserExistError = require('../utils/errors/UserExistError');
-
-const TOKEN_ENCRYPT_KEY = require('../utils/key');
 
 const User = require('../models/user');
 
@@ -16,12 +12,8 @@ const { patchRequestOptions } = require('../utils/utils');
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => {
-      if (err.statusCode) {
-        next(err);
-      } else {
-        next(new DefaultError('Ошибка сервера'));
-      }
+    .catch(() => {
+      next(new DefaultError('Ошибка сервера'));
     });
 };
 
@@ -35,7 +27,8 @@ module.exports.getUserById = (req, res, next) => {
     .catch((err) => {
       if (err.statusCode) {
         next(err);
-      } else if (err instanceof mongoose.Error.CastError) {
+        return;
+      } if (err instanceof mongoose.Error.CastError) {
         next(new ValidationError('По вашему запросу ничего не найдено'));
         return;
       }
@@ -79,11 +72,9 @@ module.exports.updateProfile = (req, res, next) => {
         next(err);
       } else if (err instanceof mongoose.Error.ValidationError) {
         next(new ValidationError('Проверьте правильность введённых данных'));
-      }
-      if (err instanceof mongoose.Error.CastError) {
+      } else if (err instanceof mongoose.Error.CastError) {
         next(new ValidationError('По вашему запросу ничего не найдено'));
-      }
-      next(new DefaultError('На сервере произошла ошибка'));
+      } else next(new DefaultError('На сервере произошла ошибка'));
     });
 };
 
@@ -101,27 +92,19 @@ module.exports.updateAvatar = (req, res, next) => {
         next(err);
       } else if (err instanceof mongoose.Error.ValidationError) {
         next(new ValidationError('Проверьте правильность введённых данных'));
-      }
-      if (err instanceof mongoose.Error.CastError) {
+      } else if (err instanceof mongoose.Error.CastError) {
         next(new ValidationError('По вашему запросу ничего не найдено'));
-      }
-      next(new DefaultError('На сервере произошла ошибка'));
+      } else next(new DefaultError('На сервере произошла ошибка'));
     });
 };
 
 module.exports.getMyProfile = (req, res, next) => {
-  const token = req.cookies.jwt;
-  if (!token) { throw new UnauthorizedError('Необходима авторизация'); }
-  let payload;
-  try {
-    payload = jwt.verify(token, TOKEN_ENCRYPT_KEY);
-    return User.findById(payload._id)
-      .then((user) => res.send(user))
-      .catch(() => next(new UnauthorizedError('Необходима авторизация')));
-  } catch (err) {
-    if (err.statusCode) {
-      return next(err);
-    }
-    return next(new DefaultError('что-то пошло не'));
-  }
+  User.findById(req.user._id)
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.statusCode) {
+        return next(err);
+      }
+      return next(new DefaultError('что-то пошло не'));
+    });
 };

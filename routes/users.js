@@ -7,14 +7,14 @@ const userParamsValidator = require('../middlewares/requestValidators/userParams
 const userDataValidator = require('../middlewares/requestValidators/userDataValidator');
 const userAvatarValidator = require('../middlewares/requestValidators/userAvatarValidator');
 
-routerUsers.get('/users', getAllUsers);
+routerUsers.get('/', getAllUsers);
 
-routerUsers.get('/users/me', getMyProfile);
+routerUsers.get('/me', getMyProfile);
 
-routerUsers.get('/users/:userId', userParamsValidator, getUserById);
+routerUsers.get('/:userId', userParamsValidator, getUserById);
 
-routerUsers.patch('/users/me', userDataValidator, updateProfile);
+routerUsers.patch('/me', userDataValidator, updateProfile);
 
-routerUsers.patch('/users/me/avatar', userAvatarValidator, updateAvatar);
+routerUsers.patch('/me/avatar', userAvatarValidator, updateAvatar);
 
 module.exports = routerUsers;
