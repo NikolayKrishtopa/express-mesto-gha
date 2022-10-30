@@ -1,5 +1,5 @@
 module.exports = (err, req, res, next) => {
-  const { statusCode = 500, message = 'Что-то пошло не так' } = err;
-  res.status(statusCode).send({ message });
+  const { statusCode = 500, message } = err;
+  res.status(statusCode).send(statusCode !== 500 ? { message } : { message: 'Что -то пошло не так' });
   next();
 };
